@@ -7,13 +7,17 @@ const colors = require('colors')
 
 // Route files
 const bootcamps = require('./routes/bootcamps')
-const { request } = require('express')
+
+
 //Load environment
 dotenv.config({ path: './config/config.env'})
 
 connectDB()
 
 const app = express()
+
+//Body Parser
+app.use(express.json())
 
 //Dev logging middleware
 if(process.env.NODE_ENV === 'development'){
@@ -25,7 +29,7 @@ app.use('/api/v1/bootcamps', bootcamps)
 
 const PORT = process.env.PORT || 5000
 
-app.listen(PORT, console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold))
+const server = app.listen(PORT, console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`.yellow.bold))
 
 //Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
