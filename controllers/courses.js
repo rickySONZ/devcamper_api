@@ -9,25 +9,20 @@ const Bootcamp = require('../models/Bootcamp')
 // @access  Public  
 
 exports.getCourses = asyncHandler(async (req, res, next) => {
-    let query;
 
-    if(req.params.bootcampId){
-        query = Course.find({ bootcamp: req.params.bootcampId})
-    } else {
-        //Optionally displays the bootcamp data with courses
-        //Select indicates the required fields
-        query = Course.find().populate({
-            path: 'bootcamp',
-            select: 'name description'
+    if (req.params.bootcampId) {
+        const courses = await Course.find({ bootcamp: req.params.bootcampId })
+        //Giving this a separate response because pagination does not make sense when just searching the bootcamp courses
+        return res.status(200).json({
+            success: true,
+            count: courses.length,
+            data: courses
         })
+    } else {
+        //access to advanced results is because route is wrapped in middleware
+        res.status(200).json(res.advancedResults)
     }
 
-    const courses = await query
-    res.status(200).json({
-        success: true,
-        count: courses.length,
-        data: courses
-    })
 })
 
 // @desc    Get single course
@@ -40,10 +35,10 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
         select: 'name description'
     })
 
-    if(!course){
+    if (!course) {
         return next(new ErrorResponse(`No course with id of ${req.params.id}`, 404))
     }
-    
+
     res.status(200).json({
         success: true,
         count: course.length,
@@ -61,12 +56,12 @@ exports.addCourse = asyncHandler(async (req, res, next) => {
 
     const bootcamp = await Bootcamp.findById(req.params.bootcampId)
 
-    if(!bootcamp){
+    if (!bootcamp) {
         return next(new ErrorResponse(`No bootcamp with id of ${req.params.bootcampId}`, 404))
     }
 
     const course = await Course.create(req.body)
-    
+
     res.status(200).json({
         success: true,
         count: course.length,
@@ -82,7 +77,7 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
     //This pulls the bootcamp param from the URL and enables the course to built off of that
     let course = await Course.findById(req.params.id)
 
-    if(!course){
+    if (!course) {
         return next(new ErrorResponse(`No course with id of ${req.params.id}`, 404))
     }
 
@@ -90,7 +85,7 @@ exports.updateCourse = asyncHandler(async (req, res, next) => {
         new: true,
         runValidators: true
     })
-    
+
     res.status(200).json({
         success: true,
         count: course.length,
@@ -106,12 +101,12 @@ exports.deleteCourse = asyncHandler(async (req, res, next) => {
     //This pulls the bootcamp param from the URL and enables the course to built off of that
     const course = await Course.findById(req.params.id)
 
-    if(!course){
+    if (!course) {
         return next(new ErrorResponse(`No course with id of ${req.params.id}`, 404))
     }
 
     await course.remove()
-    
+
     res.status(200).json({
         success: true,
         count: course.length,
