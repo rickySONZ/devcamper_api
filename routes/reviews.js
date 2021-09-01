@@ -1,7 +1,8 @@
 const express = require('express')
 const {
     getReviews,
-    getReview
+    getReview,
+    createReview
 } = require('../controllers/reviews')
 const Review = require('../models/Review')
 const advancedResults = require('../middleware/advancedResults')
@@ -14,6 +15,8 @@ router.route('/')
         path: 'bootcamp',
         select: 'name description'
     }), getReviews)
+    //Prevents bootcamp publishers from leaving false reviews
+    .post(protect, authorize('user', 'admin'), createReview)
 
 router.route('/:id')
     .get(getReview)
