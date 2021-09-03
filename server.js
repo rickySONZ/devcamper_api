@@ -10,6 +10,8 @@ const path = require('path')
 const mongoSanitize = require('express-mongo-sanitize')
 const helmet = require('helmet')
 const xss = require('xss-clean')
+const rateLimit = require('express-rate-limit')
+const hpp = require('hpp')
 
 
 // Route files
@@ -49,6 +51,11 @@ app.use(helmet())
 
 //Prevent cross site scripting attacks
 app.use(xss())
+
+//Rate Limiting
+const limiter = rateLimit({
+    windowMs: 10
+})
 
 //Set static folder
 app.use(express.static(path.join(__dirname, 'public')))
