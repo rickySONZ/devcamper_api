@@ -12,7 +12,7 @@ const helmet = require('helmet')
 const xss = require('xss-clean')
 const rateLimit = require('express-rate-limit')
 const hpp = require('hpp')
-
+const cors = require('cors')
 
 // Route files
 const bootcamps = require('./routes/bootcamps')
@@ -54,8 +54,17 @@ app.use(xss())
 
 //Rate Limiting
 const limiter = rateLimit({
-    windowMs: 10
+    windowMs: 10 * 60 * 1000,
+    max: 100
 })
+
+app.use(limiter)
+
+//Prevent http param pollution
+app.use(hpp())
+
+// Enable CORS, makes the API public
+app.use(cors())
 
 //Set static folder
 app.use(express.static(path.join(__dirname, 'public')))
